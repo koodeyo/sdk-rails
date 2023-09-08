@@ -1,0 +1,5 @@
+test:
+  mailer:
+    host: http://localhost:3002/api/v1
+    headers:
+      X-SERVICE: testService

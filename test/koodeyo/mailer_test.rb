@@ -6,7 +6,11 @@ module Koodeyo
       layout nil
 
       def deliverable(options = {})
-        headers(options.delete(:headers))
+        headers(options.delete(:headers).merge({
+          "X-MAILER": self.class.name.split('::').last.underscore,
+          "X-TEMPLATE": "welcome"
+        }))
+
         mail(options)
       end
     end
@@ -22,7 +26,7 @@ module Koodeyo
       def sample_message
         TestMailer.deliverable(
           delivery_method: :koodeyo,
-          body: 'Hallo',
+          body: JSON.dump({ name: "paul" }),
           from: 'Sender <sender@example.com>',
           subject: 'This is a test',
           to: 'Recipient <recipient@example.com>',

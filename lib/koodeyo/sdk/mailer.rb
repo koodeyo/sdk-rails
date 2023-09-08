@@ -7,17 +7,15 @@ module Koodeyo
     # Configure Rails to use this for ActionMailer in your environment configuration
     # (e.g. RAILS_ROOT/config/environments/production.rb)
     # config.action_mailer.delivery_method = :koodeyo
-
     class Mailer
       def initialize(options = {})
-        options[:headers] ||= {}
-        options[:host] ||= ENV["RAILS_ENV"] === "test" ? "http://localhost:3002/api/v1" : 'https://mailer.koodeyo.com/api/v1'
+        options[:headers] ||= mailer_config[:headers] || {}
+        options[:host] ||= endpoint
 
         @conn = Faraday.new(
           url: options[:host],
           headers: options[:headers].merge({
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer token'
+            'Content-Type': 'application/json'
           })
         ) do |f|
           f.request :json
@@ -29,7 +27,6 @@ module Koodeyo
       # correctly. Called during mail delivery.
       def deliver!(message)
         params = { raw: message.to_s }
-        params[:body] = message.body
 
         # smtp_envelope_from will default to the From address *without* sender names.
         # By omitting this param, this will correctly use sender names from the mail headers.
@@ -51,9 +48,25 @@ module Koodeyo
 
       private
 
+      def mailer_config
+        Koodeyo::Sdk.configuration[:mailer] || {}
+      end
+
+      def endpoint
+        mailer_config[:host] || default_mailer_url(Koodeyo::Sdk.configuration)
+      end
+
+      def default_mailer_url(config)
+        uri_module = config[:scheme] == 'https' ? URI::HTTPS : URI::HTTP
+        uri_module.build({
+          host: "mailer.#{config[:endpoint]}",
+          path: "/api/#{config[:api_version]}"
+        }).to_s
+      end
+
       def send_email(payload)
         response = @conn.post("delivery") do |req|
-          req.body = payload
+          req.body = { delivery: payload }
         end
 
         response.status
