@@ -15,16 +15,17 @@ module Koodeyo
       end
     end
 
+    class AccountMailer < TestMailer; end
+
     class MailerTest < ActiveSupport::TestCase
       def setup
         @client_options = {}
-
         @mailer = Mailer.new(@client_options)
         Koodeyo::Sdk.add_action_mailer_delivery_method(:koodeyo, @client_options)
       end
 
-      def sample_message
-        TestMailer.deliverable(
+      def sample_message(mailer_klass = TestMailer)
+        mailer_klass.deliverable(
           delivery_method: :koodeyo,
           body: JSON.dump({ name: "paul" }),
           from: 'Sender <sender@example.com>',
@@ -32,15 +33,18 @@ module Koodeyo
           to: 'Recipient <recipient@example.com>',
           cc: 'Recipient CC <recipient_cc@example.com>',
           bcc: 'Recipient BCC <recipient_bcc@example.com>',
-          headers: {
-            'X-SERVICE-ID' => '12'
-          }
+          headers: {}
         )
       end
 
       test "should deliver the message" do
-        code = @mailer.deliver!(sample_message)
-        assert_equal(200, code)
+        response = @mailer.deliver!(sample_message(AccountMailer))
+        assert_equal(200, response.status)
+      end
+
+      test "should not deliver the message when mailer is not support/not found" do
+        response = @mailer.deliver!(sample_message)
+        assert_equal(422, response.status)
       end
     end
   end

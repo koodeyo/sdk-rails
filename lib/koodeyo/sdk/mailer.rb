@@ -7,6 +7,7 @@ module Koodeyo
     # Configure Rails to use this for ActionMailer in your environment configuration
     # (e.g. RAILS_ROOT/config/environments/production.rb)
     # config.action_mailer.delivery_method = :koodeyo
+
     class Mailer
       def initialize(options = {})
         options[:headers] ||= mailer_config[:headers] || {}
@@ -19,7 +20,7 @@ module Koodeyo
           })
         ) do |f|
           f.request :json
-          f.response :json, parser_options: { object_class: OpenStruct }
+          f.response :json
         end
       end
 
@@ -57,7 +58,7 @@ module Koodeyo
       end
 
       def default_mailer_url(config)
-        uri_module = config[:scheme] == 'https' ? URI::HTTPS : URI::HTTP
+        uri_module = config[:scheme] === 'https' ? URI::HTTPS : URI::HTTP
         uri_module.build({
           host: "mailer.#{config[:endpoint]}",
           path: "/api/#{config[:api_version]}"
@@ -69,7 +70,7 @@ module Koodeyo
           req.body = { delivery: payload }
         end
 
-        response.status
+        response
       end
 
       def to_addresses(message)
