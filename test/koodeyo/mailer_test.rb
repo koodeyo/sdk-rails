@@ -39,11 +39,13 @@ module Koodeyo
 
       test "should deliver the message" do
         response = @mailer.deliver!(sample_message(AccountMailer))
+        assert response.success?
         assert_equal(200, response.status)
       end
 
       test "should not deliver the message when mailer is not support/not found" do
         response = @mailer.deliver!(sample_message)
+        refute response.success?
         assert_equal(422, response.status)
       end
     end

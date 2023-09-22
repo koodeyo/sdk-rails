@@ -1,5 +1,17 @@
+
+default: &default
+  scheme: https
+  host: koodeyo.com
+  version: v1
+  authorization:
+    grant_type: client_credentials
+    client_id: XaGn8HJMlVZxyX6T1WdWGXBLeLJ8rCK5ov5TvmcnD7w
+    client_secret: EDa86GcvtYEESoI-XL9dnNH6NouaM4moef49UchAEKA
+    scope: read
+
 test:
+  <<: *default
   mailer:
     host: http://localhost:3002/api/v1
-    headers:
-      X-SERVICE: testService
+  accounts:
+    host: http://localhost:3000/api/v1

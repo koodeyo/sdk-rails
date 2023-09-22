@@ -1,6 +1,4 @@
 
-require 'faraday'
-
 module Koodeyo
   module Sdk
     # Provides a delivery method for ActionMailer that uses Koodeyo email Service.
@@ -13,7 +11,7 @@ module Koodeyo
         options[:headers] ||= mailer_config[:headers] || {}
         options[:host] ||= endpoint
 
-        @conn = Faraday.new(
+        @connection = Faraday.new(
           url: options[:host],
           headers: options[:headers].merge({
             'Content-Type': 'application/json'
@@ -50,27 +48,23 @@ module Koodeyo
       private
 
       def mailer_config
-        Koodeyo::Sdk.configuration[:mailer] || {}
+        Sdk.configuration[:mailer] || {}
       end
 
       def endpoint
-        mailer_config[:host] || default_mailer_url(Koodeyo::Sdk.configuration)
+        @endpoint ||= mailer_config[:host] || default_mailer_url
       end
 
-      def default_mailer_url(config)
-        uri_module = config[:scheme] === 'https' ? URI::HTTPS : URI::HTTP
-        uri_module.build({
-          host: "mailer.#{config[:endpoint]}",
-          path: "/api/#{config[:api_version]}"
-        }).to_s
+      def default_mailer_url
+        "#{Sdk.configuration[:scheme] || "http"}://mailer.#{Sdk.configuration[:host]}/api/#{Sdk.configuration[:version]}"
       end
 
       def send_email(payload)
-        response = @conn.post("delivery") do |req|
+        response = @connection.post("delivery") do |req|
           req.body = { delivery: payload }
         end
 
-        response
+        ApiResponse.new(response)
       end
 
       def to_addresses(message)

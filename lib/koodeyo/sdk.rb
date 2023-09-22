@@ -1,22 +1,31 @@
+require "faraday"
 require "koodeyo/sdk/version"
 require "koodeyo/sdk/railtie"
 require "koodeyo/sdk/mailer"
+require "koodeyo/sdk/accounts"
 
 module Koodeyo
   module Sdk
     class Error < StandardError; end
+    class ApiResponse < SimpleDelegator
+      def initialize(response)
+        super(response)
+      end
+
+      def to_json
+        @parsed_json ||= JSON.parse(body)
+      end
+    end
 
     class << self
       # Default configs
       def defaults
-        { scheme: "https", endpoint: "koodeyo.com", api_version: "v1" }
+        { scheme: "https", host: "koodeyo.com", version: "v1" }
       end
 
       # Read config from app/config/koodeyo.yml
       def configuration
-        defaults
-          .merge(Rails.application.config_for(:koodeyo) || {})
-          .deep_symbolize_keys
+        @configuration ||= defaults.merge(Rails.application.config_for(:koodeyo) || {}).deep_symbolize_keys
       rescue StandardError
         defaults.deep_symbolize_keys
       end
