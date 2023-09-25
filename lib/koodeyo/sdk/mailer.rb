@@ -1,25 +1,20 @@
-
 module Koodeyo
   module Sdk
     # Provides a delivery method for ActionMailer that uses Koodeyo email Service.
     # Configure Rails to use this for ActionMailer in your environment configuration
     # (e.g. RAILS_ROOT/config/environments/production.rb)
     # config.action_mailer.delivery_method = :koodeyo
-
     class Mailer
       def initialize(options = {})
         options[:headers] ||= mailer_config[:headers] || {}
         options[:host] ||= endpoint
 
-        @connection = Faraday.new(
+        @connection ||= Faraday.new(
           url: options[:host],
           headers: options[:headers].merge({
             'Content-Type': 'application/json'
           })
-        ) do |f|
-          f.request :json
-          f.response :json
-        end
+        )
       end
 
       # Rails expects this method to exist, and to handle a Mail::Message object
@@ -61,7 +56,7 @@ module Koodeyo
 
       def send_email(payload)
         response = @connection.post("delivery") do |req|
-          req.body = { delivery: payload }
+          req.body = JSON.dump({ delivery: payload })
         end
 
         ApiResponse.new(response)

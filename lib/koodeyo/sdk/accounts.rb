@@ -5,15 +5,22 @@ module Koodeyo
         options[:headers] ||= accounts_config[:headers] || {}
         options[:host] ||= endpoint
         @options = options
+        @token_expiry_time = nil
+        @cached_token = nil
       end
 
       def get_access_token
-        response = auth_connection.post do |request|
-          request.url '/oauth/token'
-          request.body = Sdk.configuration[:authorization] || {}
+        if token_expired?
+          response = auth_connection.post do |request|
+            request.url '/oauth/token'
+            request.body = Sdk.configuration[:authorization] || {}
+          end
+          api_response = ApiResponse.new(response)
+          # Assuming the expires_in value is in seconds, calculate the exact time the token will expire.
+          @token_expiry_time = Time.now.to_i + api_response.to_json["expires_in"].to_i
+          @cached_token = api_response
         end
-
-        ApiResponse.new(response)
+        @cached_token
       end
 
       def validate_api_key(token)
@@ -27,6 +34,10 @@ module Koodeyo
 
       private
 
+      def token_expired?
+        @token_expiry_time.nil? || Time.now.to_i >= @token_expiry_time
+      end
+
       def endpoint
         accounts_config[:host] || "#{Sdk.configuration[:scheme] || "http"}://accounts.#{Sdk.configuration[:host]}/api/#{Sdk.configuration[:version]}"
       end
@@ -36,7 +47,7 @@ module Koodeyo
           url: @options[:host],
           headers: @options[:headers].merge({
             "Content-Type": "application/json",
-            "Authorization": "Bearer #{get_access_token.to_json["access_token"]}",
+            "Authorization": "Bearer #{get_access_token.to_json["access_token"]}"
           })
         )
       end

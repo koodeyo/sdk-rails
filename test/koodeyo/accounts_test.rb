@@ -11,7 +11,6 @@ module Koodeyo
         test "should get access_token" do
           response = @api.get_access_token
           assert response.success?
-
           # Some basic checks to ensure the response looks correct
           result = response.to_json
           assert_not_nil result["access_token"]
@@ -21,7 +20,8 @@ module Koodeyo
         end
 
         test "should validate api-key" do
-          # response = @api.validate_api_key("tkn_usr_fe7FznR6vUEJ1hMp7xFRbXqN5PgK4z")
+          response = @api.validate_api_key("tkn_usr_fe7FznR6vUEJ1hMp7xFRbXqN5PgK4z")
+          puts response.to_json
           # assert response.success?
           # result = response.to_json
           # assert result["valid"]
