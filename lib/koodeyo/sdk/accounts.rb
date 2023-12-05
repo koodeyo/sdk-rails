@@ -13,8 +13,9 @@ module Koodeyo
         if token_expired?
           response = auth_connection.post do |request|
             request.url '/oauth/token'
-            request.body = Sdk.configuration[:authorization] || {}
+            request.body = (@options[:authorization] || Sdk.configuration[:authorization] || {})
           end
+
           api_response = ApiResponse.new(response)
           # Assuming the expires_in value is in seconds, calculate the exact time the token will expire.
           @token_expiry_time = Time.now.to_i + api_response.to_json["expires_in"].to_i
@@ -29,6 +30,20 @@ module Koodeyo
           request.body = JSON.dump({ api_key: token })
         end
 
+        ApiResponse.new(response)
+      end
+
+      def get_service
+        response = connection.post do |request|
+          request.url "utils/api_keys/validate"
+          request.body = JSON.dump({ api_key: token })
+        end
+
+        ApiResponse.new(response)
+      end
+
+      def find_app_by_uid
+        response = connection.get("applications/find_by_uid")
         ApiResponse.new(response)
       end
 

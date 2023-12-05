@@ -3,6 +3,7 @@ require "koodeyo/sdk/version"
 require "koodeyo/sdk/railtie"
 require "koodeyo/sdk/mailer"
 require "koodeyo/sdk/accounts"
+require "koodeyo/sdk/meeting"
 
 module Koodeyo
   module Sdk

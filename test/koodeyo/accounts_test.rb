@@ -21,7 +21,7 @@ module Koodeyo
 
         test "should validate api-key" do
           response = @api.validate_api_key("tkn_usr_fe7FznR6vUEJ1hMp7xFRbXqN5PgK4z")
-          puts response.to_json
+          # puts response.to_json
           # assert response.success?
           # result = response.to_json
           # assert result["valid"]
