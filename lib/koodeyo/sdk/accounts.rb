@@ -44,8 +44,8 @@ module Koodeyo
         ApiResponse.new(response)
       end
 
-      def find_app_by_uid
-        response = connection.get("applications/find_by_uid")
+      def find_app_by_uid(uid)
+        response = connection.get("applications/find_by_uid?uid=#{uid}")
         ApiResponse.new(response)
       end
 
