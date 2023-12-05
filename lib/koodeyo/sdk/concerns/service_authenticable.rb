@@ -34,7 +34,7 @@ module Koodeyo
           # Only allow official apps/services
           return render_error("App not failed to authenticate") unless @service_details['is_official']
 
-          @current_service = save_service
+          save_service
         end
 
         def get_access_token
@@ -73,6 +73,7 @@ module Koodeyo
 
         def set_service
           # Try looking for the service from database
+          # @current_service = ....
         end
       end
     end
