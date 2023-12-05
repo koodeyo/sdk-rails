@@ -4,6 +4,7 @@ require "koodeyo/sdk/railtie"
 require "koodeyo/sdk/mailer"
 require "koodeyo/sdk/accounts"
 require "koodeyo/sdk/meeting"
+require "koodeyo/sdk/concerns/service_authenticable"
 
 module Koodeyo
   module Sdk
