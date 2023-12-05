@@ -5,16 +5,13 @@ module Koodeyo
         extend ActiveSupport::Concern
 
         included do
-          attr_reader :current_service, :service_id, :service_secret, :service_access_token,
+          attr_reader :service_id, :service_secret, :service_access_token,
           :service_accounts_api, :service_details
         end
 
         private
 
         def authenticate_service!
-          # set service
-          set_service
-
           # Skip
           return if current_service.present?
 
@@ -71,9 +68,7 @@ module Koodeyo
           # save :service_id, :service_details
         end
 
-        def set_service
-          # Try looking for the service from database
-          # @current_service = ....
+        def current_service
         end
       end
     end
