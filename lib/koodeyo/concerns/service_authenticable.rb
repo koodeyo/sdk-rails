@@ -37,7 +37,7 @@ module Koodeyo
       end
 
       def get_access_token
-        @service_accounts_api ||= Sdk::Accounts.new({
+        @service_accounts_api ||= Koodeyo::Sdk::Accounts.new({
           authorization: {
             grant_type: 'client_credentials',
             client_id: service_id,
