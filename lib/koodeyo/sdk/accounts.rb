@@ -1,6 +1,8 @@
 module Koodeyo
   module Sdk
     class Accounts
+      attr_reader :options
+
       def initialize(options = {})
         options[:headers] ||= accounts_config[:headers] || {}
         options[:host] ||= endpoint
@@ -13,7 +15,7 @@ module Koodeyo
         if token_expired?
           response = auth_connection.post do |request|
             request.url '/oauth/token'
-            request.body = (@options[:authorization] || Sdk.configuration[:authorization] || {})
+            request.body = (options[:authorization] || Sdk.configuration[:authorization] || {})
           end
 
           api_response = ApiResponse.new(response)
@@ -59,8 +61,8 @@ module Koodeyo
 
       def connection
         @connection ||= Faraday.new(
-          url: @options[:host],
-          headers: @options[:headers].merge({
+          url: options[:host],
+          headers: options[:headers].merge({
             "Content-Type": "application/json",
             "Authorization": "Bearer #{get_access_token.to_json["access_token"]}"
           })
