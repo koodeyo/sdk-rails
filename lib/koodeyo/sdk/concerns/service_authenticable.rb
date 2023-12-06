@@ -64,12 +64,7 @@ module Koodeyo
           render json: { message: }, status: :unauthorized
         end
 
-        def save_service
-          # save :service_id, :service_details
-        end
-
-        def current_service
-        end
+        def save_service;end
       end
     end
   end
