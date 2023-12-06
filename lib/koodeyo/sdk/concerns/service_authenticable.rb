@@ -12,15 +12,15 @@ module Koodeyo
         private
 
         def authenticate_service!
-          # Skip
-          return if current_service.present?
-
           @service_id = request.headers['Koodeyo-App-Id']
           @service_secret = request.headers['Koodeyo-App-Secret']
 
           if service_id.nil? || service_secret.nil?
             return render_error("Missing Authorization headers")
           end
+
+          # Skip
+          return if current_service.present?
 
           # get access_token
           @service_access_token = get_access_token
@@ -65,6 +65,8 @@ module Koodeyo
         end
 
         def save_service;end
+
+        def current_service;end
       end
     end
   end
