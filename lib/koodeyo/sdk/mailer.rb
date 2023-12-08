@@ -28,8 +28,8 @@ module Koodeyo
         params[:from_email_address] = message.smtp_envelope_from if message.instance_variable_get(:@smtp_envelope_from)
         params[:destination] = {
           to_addresses: to_addresses(message),
-          cc_addresses: message.cc,
-          bcc_addresses: message.bcc
+          cc_addresses: message.cc || [],
+          bcc_addresses: message.bcc || []
         }
 
         send_email(params)
